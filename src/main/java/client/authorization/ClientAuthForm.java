@@ -1,4 +1,4 @@
-package client;
+package client.authorization;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,11 +6,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class ClientForm extends Application {
+public class ClientAuthForm extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader fmxLoader = new FXMLLoader(getClass().getResource("/main.fxml"));
+
+        FXMLLoader fmxLoader = new FXMLLoader(getClass().getResource("/auth.fxml"));
         Parent root = fmxLoader.load();
         stage.setTitle("Network storage 1.0");
         Scene scene = new Scene(root);

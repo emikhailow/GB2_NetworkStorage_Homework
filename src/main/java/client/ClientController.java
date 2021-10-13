@@ -1,25 +1,28 @@
 package client;
 
+import client.interfaces.ClientCallback;
 import common.Commands;
 import common.Constants;
-import common.RequestMessage;
+import common.messages.RequestMessage;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.ArrayList;
 
 
-public class ClientController implements Initializable, ClientHandler.Callback{
+public class ClientController implements ClientCallback {
 
+
+    private String login;
     private Client client;
 
     @FXML
@@ -28,32 +31,25 @@ public class ClientController implements Initializable, ClientHandler.Callback{
     ListView<String> serverFilesList;
     @FXML
     ListView<String> clientFilesList;
+    @FXML
+    TextArea logTextArea;
+    @FXML
+    TextField loginTextField;
+    @FXML
+    Label logLabel;
 
-    public void pressOnDownloadBtn(ActionEvent actionEvent) {
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        client = new Client(this);
-        new Thread(() -> {
-            try {
-                client.connect(Constants.PORT, Constants.HOST);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Platform.exit();
-            }
-        }).start();
+    public ClientController() {
     }
 
     public void pressOnRefreshServerFilesList(ActionEvent actionEvent) {
-        client.sendMessage(new RequestMessage(Commands.GET_FILES_LIST));
+        client.sendMessage(new RequestMessage(login, Commands.GET_FILES_LIST));
     }
 
     @Override
-    public void updateServerFilesList(List<String> list) {
+    public void updateServerFilesList(ArrayList<String> filesList) {
         Platform.runLater(() -> {
             serverFilesList.getItems().clear();
-            list.stream().forEach(o -> serverFilesList.getItems().add(o));
+            filesList.stream().forEach(o -> serverFilesList.getItems().add(o));
         });
     }
 
@@ -62,7 +58,15 @@ public class ClientController implements Initializable, ClientHandler.Callback{
         Platform.runLater(() -> {
             clientFilesList.getItems().clear();
             try {
-                Files.list(Paths.get(Constants.ROOT_CLIENT_DIRECTORY))
+
+                String fullDir = String.format("%s%s%s",
+                        Constants.ROOT_CLIENT_DIRECTORY,
+                        File.separator,
+                        login);
+
+                new File(fullDir).mkdirs();
+
+                Files.list(Paths.get(fullDir))
                         .filter(f -> !Files.isDirectory(f))
                         .map(f -> f.getFileName().toString())
                         .forEach(f -> clientFilesList.getItems().add(f));
@@ -72,12 +76,40 @@ public class ClientController implements Initializable, ClientHandler.Callback{
         });
     }
 
+    @Override
+    public void appendMessage(String msg) {
+         logTextArea.appendText(msg + "\n");
+    }
+
+    @Override
+    public void setLogText(String text) {
+        Platform.runLater(() -> logLabel.setText(text));
+    }
+
     public void pressOnDownloadFileFromServer(ActionEvent actionEvent) {
-        String fileName = (String) serverFilesList.getSelectionModel().getSelectedItem();
-        client.sendMessage(new RequestMessage(Commands.DOWNLOAD_FILE, fileName));
+        String fileName = serverFilesList.getSelectionModel().getSelectedItem();
+        client.downloadFile(fileName);
     }
 
     public void pressOnRefreshClientFilesList(ActionEvent actionEvent) throws IOException {
         updateClientFilesList();
+    }
+
+    public void pressOnUploadFile(ActionEvent actionEvent) throws IOException {
+        String fileName = clientFilesList.getSelectionModel().getSelectedItem();
+        client.uploadFile(fileName);
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+        client.registerCallback(this);
+}
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public Client getClient() {
+        return client;
     }
 }

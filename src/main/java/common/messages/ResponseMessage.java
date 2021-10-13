@@ -1,12 +1,14 @@
-package common;
+package common.messages;
+
+import common.messages.AbstractMessage;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class ResponseMessage extends AbstractMessage{
+public class ResponseMessage extends AbstractMessage {
 
     private static final long serialVersionUID = 1L;
     private ArrayList<String> filesList;
+
     public ArrayList<String> getFilesList() {
         return filesList;
     }

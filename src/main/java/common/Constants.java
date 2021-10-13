@@ -6,5 +6,6 @@ public class Constants {
     public static final int PORT = 8189;
     public static final String ROOT_CLIENT_DIRECTORY = "client_storage";
     public static final String ROOT_SERVER_DIRECTORY = "server_storage";
+    public static final int BUF_SIZE = 10 * 1024 * 1024;
 
 }
