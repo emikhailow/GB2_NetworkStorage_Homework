@@ -4,9 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>GB2_NetworkStorage_Homework</groupId>
-    <artifactId>GB2_NetworkStorage_Homework</artifactId>
+    <groupId>com.gb.networkstorage</groupId>
+    <artifactId>networkstorage</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>networkstorage-server</module>
+        <module>networkstorage-client</module>
+        <module>networkstorage-common</module>
+    </modules>
 
     <properties >
         <maven.compiler.source>11</maven.compiler.source>
